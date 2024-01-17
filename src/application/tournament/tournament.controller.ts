@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { TournamentService } from './tournament.service';
+import { Roles } from 'src/auth/auth.decorators';
 import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('torneo')
@@ -22,6 +23,8 @@ export class TournamentController {
   }
 
   @Get()
+  @UseGuards(AuthGuard)
+  @Roles('admin', 'mod')
   async findAll() {
     return this.tournamentService.findAll();
   }

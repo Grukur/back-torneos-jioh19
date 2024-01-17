@@ -16,7 +16,8 @@ export class AuthService {
       console.log(user)
       throw new UnauthorizedException();
     }
-    const payload = { sub: user._id, id: user.name}
+    //added the roles property so it can fetch by the auth.guard.ts
+    const payload = { sub: user._id, id: user.name, roles: user.roles}
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
