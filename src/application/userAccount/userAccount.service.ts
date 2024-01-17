@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import {
   UserAccount,
   UserAccountDocument,
@@ -17,9 +17,23 @@ export class UserAccountService {
   ) {}
 
   async create(userAccountData: any) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { profiles, ...profile } = userAccountData;
+    const { email, profiles, ...profile } = userAccountData;
+
+    //Validator to avoid duplicates emails
+    const emailValidator = await this.userAccountModel.findOne({ email }).exec();
+    if (emailValidator){
+      throw new ConflictException('El correo ya se encuentra registrado');
+    }
     const { favorites, socialNetworks, ...rest } = profiles[0];
+
+    //Validator to avoid duplicates social networks
+    const urlValidator = await this.profileModel.findOne({
+      'socialNetworks.url': { $in: socialNetworks.map((network: any) => network.url)},
+    }).exec();
+
+    if(urlValidator){
+      throw new ConflictException("Ya existe una red social con la misma URL");
+    }
 
     const createdProfile = new this.profileModel({ ...rest });
     if (favorites) {
