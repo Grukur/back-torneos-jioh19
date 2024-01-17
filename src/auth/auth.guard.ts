@@ -43,17 +43,22 @@ export class AuthGuard implements CanActivate {
     } catch {
       throw new UnauthorizedException();
     }
-    return true
 
     //Another decorator we already create on auth.decorator.ts that check the 
     //authorization level of the user. (still not implemented -> TODO)
-    /* const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+    const requiredRoles = this.reflector.getAllAndOverride<Role[]>('roles', [
       context.getHandler(),
       context.getClass(),
     ]);
-    if (!requiredRoles) {
-      return true
-    } */
+    if (requiredRoles) {
+      const userRoles: Role[] = request['user']?.roles ??[];
+      const hasRequiredRole = requiredRoles.some(role => userRoles.includes(role));
+      if (!hasRequiredRole) {
+        throw new UnauthorizedException('Insufficient permissions');
+      }
+    }
+    
+    return true;
   }
   private extractTokenFromHeader(request: Request): string | undefined {
 

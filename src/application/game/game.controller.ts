@@ -17,18 +17,18 @@ export class GameController {
   constructor(private gameService: GameService) {}
 
   @Post()
-  @Roles(Role.ADMIN)
   async create(@Body(new ValidationPipe()) createGame: any) {
     return this.gameService.create(createGame);
   }
-
+  
   @Get()
+  @Roles('admin')
   async findAll() {
     return this.gameService.findAll();
   }
 
   @Get(':id')
-  @Roles('admin')
+  @Roles(Role.ADMIN)
   async findOne(@Param('id') id: string) {
     return this.gameService.findOne(id);
   }

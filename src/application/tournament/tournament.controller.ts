@@ -21,7 +21,6 @@ export class TournamentController {
     return this.tournamentService.create(createTournament);
   }
 
-  @UseGuards(AuthGuard)
   @Get()
   async findAll() {
     return this.tournamentService.findAll();
